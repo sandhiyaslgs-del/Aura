@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA-X | Anti-Drug Platform</title>
+  <style>
+    :root {
+      --bg-dark: #0a0c10;
+      --card-bg: rgba(22, 27, 34, 0.75);
+      --emerald-green: #10b981;
+      --glow-green: #34d399;
+      --earth-brown: #9a6052;
+      --warm-brown: #6b4236;
+      --text-light: #f0f6fc;
+      --text-muted: #8b949e;
+    }
+
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-light);
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* CYBER GRID PATTERN */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -2;
+    }
+
+    /* ANIMATED BACKGROUND LIGHT ORBS */
+    .bg-orb-1 {
+      position: fixed; top: -120px; left: -120px; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+      border-radius: 50%; z-index: -1; animation: floatOrb 10s infinite alternate ease-in-out;
+    }
+
+    .bg-orb-2 {
+      position: fixed; bottom: -120px; right: -120px; width: 550px; height: 550px;
+      background: radial-gradient(circle, rgba(154, 96, 82, 0.2) 0%, transparent 70%);
+      border-radius: 50%; z-index: -1; animation: floatOrb 12s infinite alternate-reverse ease-in-out;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(70px, 50px) scale(1.15); }
+    }
+
+    /* TOP HEADER NAVBAR */
+    .navbar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(13, 16, 21, 0.85); backdrop-filter: blur(15px);
+      padding: 14px 30px; position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 25px rgba(0,0,0,0.8);
+    }
+
+    .logo-container { display: flex; align-items: center; gap: 14px; }
+
+    .logo-badge {
+      position: relative; width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--emerald-green), var(--earth-brown));
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 15px var(--glow-green);
+    }
+
+    .logo-badge-inner {
+      width: 36px; height: 36px; background: var(--bg-dark);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 18px; color: var(--glow-green);
+    }
+
+    .logo-text {
+      font-size: 24px; font-weight: 900; letter-spacing: 2px;
+      background: linear-gradient(to right, #ffffff, var(--glow-green));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .nav-tabs {
+      display: flex; gap: 8px; background: rgba(0, 0, 0, 0.6);
+      padding: 6px 12px; border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-btn {
+      color: var(--text-muted); text-decoration: none; padding: 8px 20px;
+      border-radius: 20px; font-weight: 600; font-size: 14px; transition: all 0.3s ease;
+    }
+
+    .nav-btn.active, .nav-btn:hover {
+      background: linear-gradient(135deg, var(--emerald-green), #059669);
+      color: #ffffff; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .right-controls { display: flex; align-items: center; gap: 15px; }
+
+    .profile-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--earth-brown), var(--warm-brown));
+      border: 2px solid var(--emerald-green);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; color: white; text-decoration: none;
+    }
+
+    .settings-btn {
+      color: var(--text-light); text-decoration: none; font-size: 20px;
+      border-radius: 50%; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex; align-items: center; justify-content: center;
+      width: 42px; height: 42px;
+    }
+
+    /* MAIN CONTENT AREA */
+    .container { max-width: 1050px; margin: 50px auto; padding: 0 20px; }
+
+    .hero-card {
+      background: var(--card-bg); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid var(--emerald-green);
+      border-radius: 20px; padding: 50px 35px; text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+    }
+
+    .hero-card h1 {
+      font-size: 42px;
+      background: linear-gradient(135deg, #ffffff, var(--glow-green));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    .hero-card p { color: var(--text-muted); font-size: 17px; max-width: 680px; margin: 0 auto 35px; line-height: 1.7; }
+
+    .btn-action {
+      display: inline-block; text-decoration: none;
+      background: linear-gradient(135deg, var(--emerald-green), #059669);
+      color: white; padding: 14px 30px; font-size: 16px; font-weight: 700;
+      border-radius: 12px; margin: 8px; transition: all 0.3s ease;
+    }
+
+    .btn-brown { background: linear-gradient(135deg, var(--earth-brown), var(--warm-brown)); }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 25px; margin-top: 40px; }
+
+    .feature-card {
+      background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px; padding: 28px; text-decoration: none; display: block;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover { transform: translateY(-5px); border-color: var(--emerald-green); }
+    .feature-card h3 { color: var(--glow-green); font-size: 20px; margin-bottom: 12px; }
+    .feature-card p { color: var(--text-muted); font-size: 15px; line-height: 1.6; }
+    .card-link-text { color: var(--emerald-green); font-size: 13px; font-weight: bold; margin-top: 15px; display: inline-block; }
+
+    /* MOBILE RESPONSIVE TWEAKS */
+    @media (max-width: 768px) {
+      .navbar { flex-direction: column; gap: 12px; padding: 12px 15px; }
+      .nav-tabs { width: 100%; justify-content: center; overflow-x: auto; }
+      .nav-btn { padding: 6px 14px; font-size: 13px; white-space: nowrap; }
+      .hero-card h1 { font-size: 28px; }
+      .btn-action { display: block; width: 100%; margin: 8px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-orb-1"></div>
+  <div class="bg-orb-2"></div>
+
+  <!-- NAVBAR LINKED TO game.html -->
+  <header class="navbar">
+    <div class="logo-container">
+      <div class="logo-badge"><div class="logo-badge-inner">A</div></div>
+      <div class="logo-text">AURA-X</div>
+    </div>
+
+    <nav class="nav-tabs">
+      <a href="index.html" class="nav-btn active">Home</a>
+      <a href="game.html" class="nav-btn">Games</a>
+      <a href="community.html" class="nav-btn">Community</a>
+      <a href="ai_companion.html" class="nav-btn">AI Companion</a>
+    </nav>
+
+    <div class="right-controls">
+      <a href="profile.html" class="profile-avatar">AJ</a>
+      <a href="settings.html" class="settings-btn">⚙️</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="hero-card">
+      <h1>Building our  Drug-Free Tamil Nadu</h1>
+      <p>Empowering youth through interactive behavioral games, refusal mechanics, survivor communities, and 24/7 automated support.</p>
+      <!-- BUTTON LINKED TO game.html -->
+      <a href="game.html" class="btn-action">🎮 Explore Games</a>
+      <a href="chatbot.html" class="btn-action btn-brown">🤖 Talk to AI Companion</a>
+    </div>
+
+    <div class="grid">
+      <a href="learn.html#dopamine" class="feature-card">
+        <h3>🧠 Brain Dopamine Science</h3>
+        <p>Interactive insights explaining how positive habits protect the reward system from addictive triggers.</p>
+        <span class="card-link-text">Read Article →</span>
+      </a>
+
+      <a href="learn.html#refusal" class="feature-card">
+        <h3>🛡️ Refusal Skill Scenarios</h3>
+        <p>Gamified scenario training to build confidence in resisting peer pressure in high-risk environments.</p>
+        <span class="card-link-text">Learn Techniques →</span>
+      </a>
+
+      <a href="sos.html" class="feature-card">
+        <h3>🆘 Emergency Support Hub</h3>
+        <p>Immediate 24/7 access to Tamil Nadu & National toll-free helpline support services (1800-11-0031).</p>
+        <span class="card-link-text" style="color: var(--earth-brown);">View Helplines →</span>
+      </a>
+    </div>
+  </main>
+
+</body>
+</html>

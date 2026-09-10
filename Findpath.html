@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Safe Pathway Challenge</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    min-height:100vh;
+    background:#050807;
+    color:#e5e7eb;
+    font-family:Arial,Helvetica,sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:12px;
+    overflow-x:hidden;
+}
+
+.app{
+    width:100%;
+    max-width:950px;
+    background:#0b1210;
+    border:1px solid #214438;
+    border-radius:20px;
+    padding:18px;
+    box-shadow:0 0 40px rgba(16,185,129,.10);
+}
+
+/* TITLE */
+
+.title{
+    text-align:center;
+    margin-bottom:16px;
+}
+
+.title h1{
+    color:#34d399;
+    font-size:clamp(24px,5vw,38px);
+    margin-bottom:5px;
+}
+
+.title p{
+    color:#94a3b8;
+    font-size:13px;
+}
+
+/* HEADER */
+
+.header{
+    display:grid;
+    grid-template-columns:1fr auto auto;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.box{
+    background:#101a17;
+    border:1px solid #23483b;
+    border-radius:11px;
+    padding:10px 13px;
+}
+
+.box small{
+    display:block;
+    color:#6b7280;
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:4px;
+}
+
+.box strong{
+    color:#f9fafb;
+    font-size:15px;
+}
+
+.score strong{
+    color:#34d399;
+    font-size:19px;
+}
+
+#nextBtn{
+    display:none;
+    border:none;
+    border-radius:10px;
+    padding:0 18px;
+    background:#10b981;
+    color:#02130d;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#nextBtn:hover{
+    background:#34d399;
+}
+
+/* STATUS */
+
+.status{
+    min-height:42px;
+    background:#0d1814;
+    border:1px solid #1d3d32;
+    border-radius:10px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:8px;
+    color:#a7f3d0;
+    font-size:13px;
+    margin-bottom:12px;
+}
+
+/* GAME AREA */
+
+.game-area{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+}
+
+/* CANVAS */
+
+.canvas-wrap{
+    width:min(58vw,540px);
+    aspect-ratio:1/1;
+    padding:5px;
+    background:#020504;
+    border:2px solid #285342;
+    border-radius:15px;
+    flex-shrink:0;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:100%;
+    border-radius:10px;
+    touch-action:none;
+}
+
+/* CONTROLS */
+
+.controls-wrap{
+    width:125px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.controls{
+    display:grid;
+    grid-template-columns:repeat(3,42px);
+    grid-template-rows:repeat(2,42px);
+    gap:7px;
+}
+
+.control{
+    width:42px;
+    height:42px;
+    border:1px solid #2b5c4b;
+    border-radius:10px;
+    background:#0e1b17;
+    color:#34d399;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    touch-action:manipulation;
+}
+
+.control:active{
+    transform:scale(.90);
+    background:#174234;
+}
+
+.up{
+    grid-column:2;
+}
+
+.left{
+    grid-column:1;
+    grid-row:2;
+}
+
+.down{
+    grid-column:2;
+    grid-row:2;
+}
+
+.right{
+    grid-column:3;
+    grid-row:2;
+}
+
+/* INFO */
+
+.instructions{
+    text-align:center;
+    color:#64748b;
+    font-size:11px;
+    margin-top:10px;
+}
+
+.legend{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:6px;
+    margin-top:12px;
+}
+
+.legend span{
+    background:#0a1210;
+    border:1px solid #1d352d;
+    border-radius:8px;
+    padding:5px 7px;
+    font-size:10px;
+    color:#94a3b8;
+}
+
+/* PHONE */
+
+@media(max-width:600px){
+
+    body{
+        padding:6px;
+    }
+
+    .app{
+        padding:10px;
+        border-radius:15px;
+    }
+
+    .title{
+        margin-bottom:10px;
+    }
+
+    .title h1{
+        font-size:22px;
+    }
+
+    .title p{
+        font-size:10px;
+    }
+
+    .header{
+        grid-template-columns:1fr auto;
+    }
+
+    .box{
+        padding:8px 9px;
+    }
+
+    .box strong{
+        font-size:12px;
+    }
+
+    .score strong{
+        font-size:16px;
+    }
+
+    #nextBtn{
+        grid-column:1/-1;
+        min-height:42px;
+    }
+
+    .status{
+        font-size:10px;
+        min-height:36px;
+    }
+
+    /* MAZE TOP / BUTTONS BOTTOM */
+
+    .game-area{
+        flex-direction:column;
+        gap:12px;
+    }
+
+    .canvas-wrap{
+        width:min(82vw,390px);
+        padding:4px;
+        border-radius:13px;
+    }
+
+    .controls-wrap{
+        width:100%;
+    }
+
+    .controls{
+        grid-template-columns:repeat(3,54px);
+        grid-template-rows:repeat(2,47px);
+        gap:5px;
+    }
+
+    .control{
+        width:54px;
+        height:47px;
+        font-size:18px;
+    }
+
+    .instructions{
+        font-size:9px;
+    }
+
+    .legend span{
+        font-size:8px;
+    }
+}
+
+@media(max-width:360px){
+
+    .canvas-wrap{
+        width:78vw;
+    }
+
+    .controls{
+        grid-template-columns:repeat(3,48px);
+        grid-template-rows:repeat(2,43px);
+    }
+
+    .control{
+        width:48px;
+        height:43px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="title">
+        <h1>🟢 Safe Pathway Challenge</h1>
+        <p>Choose the safe path. Build your future.</p>
+    </div>
+
+    <div class="header">
+
+        <div class="box">
+            <small>Current Zone</small>
+            <strong id="levelName">Level 1: School Zone 🏫</strong>
+        </div>
+
+        <div class="box score">
+            <small>XP / Score</small>
+            <strong id="score">0</strong>
+        </div>
+
+        <button id="nextBtn">Next Level →</button>
+
+    </div>
+
+    <div class="status" id="status">
+        🧭 Find the safe path and reach 🎓!
+    </div>
+
+    <div class="game-area">
+
+        <div class="canvas-wrap">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <div class="controls-wrap">
+
+            <div class="controls">
+
+                <button class="control up" data-move="up">▲</button>
+
+                <button class="control left" data-move="left">◀</button>
+
+                <button class="control down" data-move="down">▼</button>
+
+                <button class="control right" data-move="right">▶</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="instructions">
+        ⌨️ Use Arrow Keys &nbsp; | &nbsp; 📱 Use Touch Controls
+    </div>
+
+    <div class="legend">
+        <span>🧍‍♂️ Student</span>
+        <span>🎓 Goal</span>
+        <span>🟩 Safe Path</span>
+        <span>⬛ Wall</span>
+        <span>📚 +50 XP</span>
+        <span>⚽ +50 XP</span>
+        <span>🎵 +50 XP</span>
+        <span>🧘‍♂️ +50 XP</span>
+        <span>🚬 🍾 💉 💊 Trap</span>
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   SAFE PATHWAY CHALLENGE
+===================================================== */
+
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const levelName = document.getElementById("levelName");
+const scoreEl = document.getElementById("score");
+const statusEl = document.getElementById("status");
+const nextBtn = document.getElementById("nextBtn");
+
+
+/* =====================================================
+   GAME SETTINGS
+===================================================== */
+
+const SIZE = 15;
+
+canvas.width = SIZE * 40;
+canvas.height = SIZE * 40;
+
+
+/* =====================================================
+   LEVELS
+===================================================== */
+
+const levels = [
+
+    {
+        name:"Level 1: School Zone 🏫",
+        difficulty:"Easy",
+        seed:101,
+        traps:3,
+        items:4
+    },
+
+    {
+        name:"Level 2: College Campus 🎓",
+        difficulty:"Moderate",
+        seed:202,
+        traps:5,
+        items:5
+    },
+
+    {
+        name:"Level 3: Nightlife / Club Zone 🕺",
+        difficulty:"Hard",
+        seed:303,
+        traps:7,
+        items:6
+    },
+
+    {
+        name:"Level 4: Corporate Career Path 💼",
+        difficulty:"Strategic",
+        seed:404,
+        traps:8,
+        items:7
+    },
+
+    {
+        name:"Level 5: Clean Future Mastery 🌟",
+        difficulty:"Ultimate",
+        seed:505,
+        traps:10,
+        items:8
+    }
+
+];
+
+
+/* =====================================================
+   EMOJIS
+===================================================== */
+
+const trapsEmoji = [
+    "🚬",
+    "🍾",
+    "💉",
+    "💊"
+];
+
+const positiveEmoji = [
+    "📚",
+    "⚽",
+    "🎵",
+    "🧘‍♂️"
+];
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let currentLevel = 0;
+
+let score = 0;
+
+let grid = [];
+
+let originalGrid = [];
+
+let safePath = [];
+
+let traps = [];
+
+let collectibles = [];
+
+let gameFinished = false;
+
+
+let player = {
+    x:1,
+    y:1
+};
+
+let goal = {
+    x:SIZE-2,
+    y:SIZE-2
+};
+
+
+/* =====================================================
+   SEEDED RANDOM
+===================================================== */
+
+function randomGenerator(seed){
+
+    let value = seed;
+
+    return function(){
+
+        value =
+            (value * 9301 + 49297) % 233280;
+
+        return value / 233280;
+    };
+}
+
+
+/* =====================================================
+   SHUFFLE
+===================================================== */
+
+function shuffle(array, random){
+
+    for(let i=array.length-1;i>0;i--){
+
+        const j =
+            Math.floor(random()*(i+1));
+
+        [array[i],array[j]] =
+        [array[j],array[i]];
+    }
+
+    return array;
+}
+
+
+/* =====================================================
+   CREATE MAZE
+===================================================== */
+
+function createMaze(seed){
+
+    const random = randomGenerator(seed);
+
+    const maze =
+        Array.from(
+            {length:SIZE},
+            () => Array(SIZE).fill("#")
+        );
+
+
+    function carve(x,y){
+
+        maze[y][x] = ".";
+
+        const directions = shuffle(
+            [
+                [2,0],
+                [-2,0],
+                [0,2],
+                [0,-2]
+            ],
+            random
+        );
+
+
+        for(const [dx,dy] of directions){
+
+            const nx = x + dx;
+            const ny = y + dy;
+
+            if(
+                nx > 0 &&
+                nx < SIZE-1 &&
+                ny > 0 &&
+                ny < SIZE-1 &&
+                maze[ny][nx] === "#"
+            ){
+
+                maze[y + dy/2][x + dx/2] = ".";
+
+                carve(nx,ny);
+            }
+        }
+    }
+
+
+    carve(1,1);
+
+    maze[goal.y][goal.x] = ".";
+
+    return maze;
+}
+
+
+/* =====================================================
+   FIND SAFE PATH USING BFS
+===================================================== */
+
+function findPath(){
+
+    const queue = [
+        [1,1]
+    ];
+
+    const parent = new Map();
+
+    const visited = new Set();
+
+    visited.add("1,1");
+
+
+    const directions = [
+        [1,0],
+        [-1,0],
+        [0,1],
+        [0,-1]
+    ];
+
+
+    while(queue.length){
+
+        const [x,y] = queue.shift();
+
+        if(x === goal.x && y === goal.y){
+
+            const path = [];
+
+            let current = `${x},${y}`;
+
+            while(current){
+
+                const [px,py] =
+                    current.split(",").map(Number);
+
+                path.push({
+                    x:px,
+                    y:py
+                });
+
+                current = parent.get(current);
+            }
+
+            return path.reverse();
+        }
+
+
+        for(const [dx,dy] of directions){
+
+            const nx = x + dx;
+            const ny = y + dy;
+
+            const key = `${nx},${ny}`;
+
+            if(
+                nx >= 0 &&
+                nx < SIZE &&
+                ny >= 0 &&
+                ny < SIZE &&
+                grid[ny][nx] === "." &&
+                !visited.has(key)
+            ){
+
+                visited.add(key);
+
+                parent.set(
+                    key,
+                    `${x},${y}`
+                );
+
+                queue.push([nx,ny]);
+            }
+        }
+    }
+
+    return [];
+}
+
+
+/* =====================================================
+   GET OPEN CELLS
+===================================================== */
+
+function getOpenCells(){
+
+    const cells = [];
+
+    for(let y=1;y<SIZE-1;y++){
+
+        for(let x=1;x<SIZE-1;x++){
+
+            if(grid[y][x] === "."){
+
+                if(
+                    !(x === player.x && y === player.y) &&
+                    !(x === goal.x && y === goal.y)
+                ){
+
+                    cells.push({x,y});
+                }
+            }
+        }
+    }
+
+    return cells;
+}
+
+
+/* =====================================================
+   DISTANCE
+===================================================== */
+
+function distance(a,b){
+
+    return Math.abs(a.x-b.x) +
+           Math.abs(a.y-b.y);
+}
+
+
+/* =====================================================
+   PLACE OBJECTS
+===================================================== */
+
+function placeObjects(level){
+
+    traps = [];
+    collectibles = [];
+
+
+    const random =
+        randomGenerator(level.seed + 9000);
+
+
+    let cells = getOpenCells();
+
+
+    /*
+       Important:
+       Never place traps on the guaranteed
+       safe path.
+    */
+
+    const safeKeys =
+        new Set(
+            safePath.map(
+                p => `${p.x},${p.y}`
+            )
+        );
+
+
+    let trapCells =
+        cells.filter(
+            cell =>
+                !safeKeys.has(
+                    `${cell.x},${cell.y}`
+                )
+        );
+
+
+    shuffle(trapCells,random);
+
+
+    /*
+       Place traps away from start.
+    */
+
+    trapCells =
+        trapCells.filter(
+            cell =>
+                distance(cell,player) > 2
+        );
+
+
+    for(
+        let i=0;
+        i<level.traps && trapCells.length;
+        i++
+    ){
+
+        const cell = trapCells.pop();
+
+        traps.push({
+
+            x:cell.x,
+            y:cell.y,
+
+            emoji:
+                trapsEmoji[
+                    Math.floor(
+                        random()*trapsEmoji.length
+                    )
+                ]
+        });
+    }
+
+
+    /*
+       Collectibles CAN be on safe path.
+       This makes the safe route rewarding.
+    */
+
+    let itemCells =
+        safePath.filter(
+            cell =>
+                !(cell.x === 1 && cell.y === 1) &&
+                !(cell.x === goal.x && cell.y === goal.y)
+        );
+
+
+    shuffle(itemCells,random);
+
+
+    for(
+        let i=0;
+        i<level.items && itemCells.length;
+        i++
+    ){
+
+        const cell = itemCells.pop();
+
+        collectibles.push({
+
+            x:cell.x,
+            y:cell.y,
+
+            emoji:
+                positiveEmoji[
+                    Math.floor(
+                        random()*positiveEmoji.length
+                    )
+                ],
+
+            collected:false
+        });
+    }
+}
+
+
+/* =====================================================
+   LOAD LEVEL
+===================================================== */
+
+function loadLevel(index){
+
+    currentLevel = index;
+
+    const level = levels[currentLevel];
+
+
+    player = {
+        x:1,
+        y:1
+    };
+
+
+    goal = {
+        x:SIZE-2,
+        y:SIZE-2
+    };
+
+
+    /*
+       Generate until a path exists.
+    */
+
+    do{
+
+        grid = createMaze(level.seed);
+
+        safePath = findPath();
+
+    }
+    while(safePath.length === 0);
+
+
+    /*
+       Deep copy.
+    */
+
+    originalGrid =
+        JSON.parse(
+            JSON.stringify(grid)
+        );
+
+    grid =
+        JSON.parse(
+            JSON.stringify(originalGrid)
+        );
+
+
+    placeObjects(level);
+
+
+    gameFinished = false;
+
+
+    levelName.textContent =
+        level.name;
+
+
+    statusEl.textContent =
+        `🧭 ${level.difficulty} — Find the safe path to 🎓`;
+
+
+    nextBtn.style.display = "none";
+
+
+    draw();
+}
+
+
+/* =====================================================
+   RESTART LEVEL
+===================================================== */
+
+function restartLevel(){
+
+    grid =
+        JSON.parse(
+            JSON.stringify(originalGrid)
+        );
+
+
+    player = {
+        x:1,
+        y:1
+    };
+
+
+    /*
+       Rebuild objects.
+    */
+
+    placeObjects(
+        levels[currentLevel]
+    );
+
+
+    gameFinished = false;
+
+
+    nextBtn.style.display = "none";
+
+
+    statusEl.textContent =
+        "🚫 Harmful trap! Restarting the level...";
+
+
+    draw();
+
+
+    setTimeout(()=>{
+
+        statusEl.textContent =
+            "🧭 Try another safe pathway!";
+
+    },700);
+}
+
+
+/* =====================================================
+   MOVE PLAYER
+===================================================== */
+
+function move(dx,dy){
+
+    if(gameFinished) return;
+
+
+    const nx = player.x + dx;
+    const ny = player.y + dy;
+
+
+    /*
+       Can't leave maze.
+    */
+
+    if(
+        nx < 0 ||
+        nx >= SIZE ||
+        ny < 0 ||
+        ny >= SIZE
+    ){
+        return;
+    }
+
+
+    /*
+       Wall.
+    */
+
+    if(grid[ny][nx] === "#"){
+
+        statusEl.textContent =
+            "🧱 Wall! Find another route.";
+
+        return;
+    }
+
+
+    player.x = nx;
+    player.y = ny;
+
+
+    checkPosition();
+
+    draw();
+}
+
+
+/* =====================================================
+   CHECK PLAYER POSITION
+===================================================== */
+
+function checkPosition(){
+
+
+    /*
+       TRAP
+    */
+
+    const trap =
+        traps.find(
+            t =>
+                t.x === player.x &&
+                t.y === player.y
+        );
+
+
+    if(trap){
+
+        statusEl.textContent =
+            "⚠️ Harmful influence! Choose a safer pathway.";
+
+        draw();
+
+        setTimeout(
+            restartLevel,
+            350
+        );
+
+        return;
+    }
+
+
+    /*
+       COLLECTIBLE
+    */
+
+    const item =
+        collectibles.find(
+            c =>
+                c.x === player.x &&
+                c.y === player.y &&
+                !c.collected
+        );
+
+
+    if(item){
+
+        item.collected = true;
+
+        score += 50;
+
+        scoreEl.textContent = score;
+
+        statusEl.textContent =
+            `✨ Great choice! ${item.emoji} +50 XP`;
+    }
+
+
+    /*
+       GOAL
+    */
+
+    if(
+        player.x === goal.x &&
+        player.y === goal.y
+    ){
+
+        completeLevel();
+    }
+}
+
+
+/* =====================================================
+   COMPLETE LEVEL
+===================================================== */
+
+function completeLevel(){
+
+    gameFinished = true;
+
+
+    if(currentLevel === levels.length-1){
+
+        statusEl.textContent =
+            `🌟 MASTERED! You reached a clean future. Final XP: ${score}`;
+
+        nextBtn.style.display = "none";
+
+    }else{
+
+        statusEl.textContent =
+            "🎓 Level Cleared! Healthy choices build your future.";
+
+        nextBtn.style.display = "block";
+    }
+
+
+    draw();
+}
+
+
+/* =====================================================
+   NEXT LEVEL
+===================================================== */
+
+nextBtn.addEventListener(
+    "click",
+    ()=>{
+
+        if(currentLevel < levels.length-1){
+
+            loadLevel(currentLevel+1);
+        }
+    }
+);
+
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        let dx = 0;
+        let dy = 0;
+
+
+        if(event.key === "ArrowUp"){
+            dy = -1;
+        }
+
+        else if(event.key === "ArrowDown"){
+            dy = 1;
+        }
+
+        else if(event.key === "ArrowLeft"){
+            dx = -1;
+        }
+
+        else if(event.key === "ArrowRight"){
+            dx = 1;
+        }
+
+        else{
+            return;
+        }
+
+
+        event.preventDefault();
+
+        move(dx,dy);
+    }
+);
+
+
+/* =====================================================
+   TOUCH BUTTONS
+===================================================== */
+
+document
+.querySelectorAll(".control")
+.forEach(button => {
+
+    button.addEventListener(
+        "pointerdown",
+        event => {
+
+            event.preventDefault();
+
+            const direction =
+                button.dataset.move;
+
+
+            if(direction === "up"){
+                move(0,-1);
+            }
+
+            if(direction === "down"){
+                move(0,1);
+            }
+
+            if(direction === "left"){
+                move(-1,0);
+            }
+
+            if(direction === "right"){
+                move(1,0);
+            }
+        }
+    );
+});
+
+
+/* =====================================================
+   DRAW
+===================================================== */
+
+function draw(){
+
+    const tile =
+        canvas.width / SIZE;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+       DRAW MAZE
+    */
+
+    for(let y=0;y<SIZE;y++){
+
+        for(let x=0;x<SIZE;x++){
+
+            const px = x*tile;
+            const py = y*tile;
+
+
+            if(grid[y][x] === "#"){
+
+                /*
+                   WALL = DARK
+                */
+
+                ctx.fillStyle = "#111827";
+
+                ctx.fillRect(
+                    px,
+                    py,
+                    tile,
+                    tile
+                );
+
+
+                ctx.strokeStyle = "#374151";
+
+                ctx.lineWidth = 1;
+
+                ctx.strokeRect(
+                    px+.5,
+                    py+.5,
+                    tile-1,
+                    tile-1
+                );
+
+            }else{
+
+                /*
+                   WALKABLE PATH = GREEN/DARK
+                */
+
+                ctx.fillStyle =
+                    (x+y)%2 === 0
+                    ? "#d1fae5"
+                    : "#bbf7d0";
+
+                ctx.fillRect(
+                    px,
+                    py,
+                    tile,
+                    tile
+                );
+            }
+        }
+    }
+
+
+    /*
+       DRAW COLLECTIBLES
+    */
+
+    collectibles.forEach(item=>{
+
+        if(item.collected) return;
+
+        drawEmoji(
+            item.emoji,
+            item.x,
+            item.y,
+            tile*.62
+        );
+    });
+
+
+    /*
+       DRAW TRAPS
+    */
+
+    traps.forEach(trap=>{
+
+        drawCircle(
+            trap.x,
+            trap.y,
+            tile,
+            "rgba(239,68,68,.18)",
+            "#ef4444"
+        );
+
+        drawEmoji(
+            trap.emoji,
+            trap.x,
+            trap.y,
+            tile*.62
+        );
+    });
+
+
+    /*
+       DRAW GOAL
+    */
+
+    drawCircle(
+        goal.x,
+        goal.y,
+        tile,
+        "rgba(16,185,129,.22)",
+        "#10b981"
+    );
+
+    drawEmoji(
+        "🎓",
+        goal.x,
+        goal.y,
+        tile*.68
+    );
+
+
+    /*
+       DRAW PLAYER LAST
+       So player is always visible.
+    */
+
+    drawCircle(
+        player.x,
+        player.y,
+        tile,
+        "rgba(16,185,129,.30)",
+        "#059669"
+    );
+
+    drawEmoji(
+        "🧍‍♂️",
+        player.x,
+        player.y,
+        tile*.68
+    );
+}
+
+
+/* =====================================================
+   DRAW CIRCLE
+===================================================== */
+
+function drawCircle(
+    x,
+    y,
+    tile,
+    fill,
+    stroke
+){
+
+    const cx =
+        x*tile + tile/2;
+
+    const cy =
+        y*tile + tile/2;
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        cx,
+        cy,
+        tile*.38,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle = fill;
+
+    ctx.fill();
+
+    ctx.strokeStyle = stroke;
+
+    ctx.lineWidth = 2;
+
+    ctx.stroke();
+}
+
+
+/* =====================================================
+   DRAW EMOJI
+===================================================== */
+
+function drawEmoji(
+    emoji,
+    x,
+    y,
+    size
+){
+
+    const tile =
+        canvas.width / SIZE;
+
+
+    ctx.font =
+        `${size}px "Segoe UI Emoji","Apple Color Emoji",sans-serif`;
+
+    ctx.textAlign = "center";
+
+    ctx.textBaseline = "middle";
+
+
+    ctx.fillText(
+        emoji,
+        x*tile + tile/2,
+        y*tile + tile/2
+    );
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+loadLevel(0);
+
+</script>
+
+</body>
+</html>

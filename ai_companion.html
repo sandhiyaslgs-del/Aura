@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA-X AI Companion</title>
+  <style>
+    :root {
+      --bg-dark: #060c0e;
+      --card-bg: #10171d;
+      --accent-green: #00e599;
+      --accent-glow: rgba(0, 229, 153, 0.4);
+      --text: #ffffff;
+      --text-muted: #8c9da8;
+      --border: rgba(255, 255, 255, 0.08);
+      --chat-user: rgba(0, 229, 153, 0.15);
+      --chat-ai: rgba(255, 255, 255, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Inter, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--text);
+    }
+
+    .brand-logo-svg {
+      width: 32px;
+      height: 36px;
+    }
+
+    .home-btn {
+      background: var(--accent-green);
+      color: #000;
+      text-decoration: none;
+      padding: 10px 26px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 0 15px var(--accent-glow);
+      transition: all 0.3s ease;
+    }
+
+    .home-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px var(--accent-glow);
+      filter: brightness(1.1);
+    }
+
+    /* Header Section */
+    .header-section {
+      text-align: center;
+      max-width: 750px;
+      margin-bottom: 25px;
+    }
+
+    .header-section h1 {
+      font-size: 38px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    .header-section p {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* Chat Container */
+    .chat-wrapper {
+      width: 100%;
+      max-width: 800px;
+      height: 520px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .chat-header {
+      padding: 18px 25px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ai-status {
+      width: 10px;
+      height: 10px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-green);
+    }
+
+    .chat-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .chat-messages {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+
+    .message.ai {
+      align-self: flex-start;
+      background: var(--chat-ai);
+      border: 1px solid var(--border);
+      color: #e2e8f0;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: var(--chat-user);
+      border: 1px solid rgba(0, 229, 153, 0.3);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+
+    /* Suggested Quick Prompts */
+    .quick-prompts {
+      display: flex;
+      gap: 10px;
+      padding: 10px 20px;
+      overflow-x: auto;
+      border-top: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .prompt-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 15px;
+      font-size: 12px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .prompt-btn:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    /* Chat Input Bar */
+    .chat-input-area {
+      padding: 15px 20px;
+      display: flex;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 1px solid var(--border);
+    }
+
+    .chat-input {
+      flex-grow: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent-green);
+    }
+
+    .send-btn {
+      background: var(--accent-green);
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .send-btn:hover {
+      box-shadow: 0 0 15px var(--accent-glow);
+      filter: brightness(1.1);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <div class="nav-bar">
+    <div class="brand">
+      <svg class="brand-logo-svg" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,5 95,30 95,85 50,110 5,85 5,30" stroke="#00e599" stroke-width="10" fill="none" />
+        <text x="50" y="78" font-size="58" font-weight="900" fill="#00e599" text-anchor="middle" font-family="Arial, sans-serif">A</text>
+      </svg>
+      <span>AURA-X</span>
+    </div>
+    <a href="homepage.html" class="home-btn">Home</a>
+  </div>
+
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1>AURA-X AI Companion</h1>
+    <p>Your 24/7 confidential recovery partner. Ask questions, seek support, or get instant motivation whenever you feel overwhelmed.</p>
+  </div>
+
+  <!-- Chat Box Container -->
+  <div class="chat-wrapper">
+    <div class="chat-header">
+      <div class="ai-status"></div>
+      <h2>AURA Companion (Online)</h2>
+    </div>
+
+    <!-- Messages Window -->
+    <div class="chat-messages" id="chatMessages">
+      <div class="message ai">
+        Hello! I am your AURA-X Support Companion. I am here to listen, offer guidance on addiction recovery, and help you stay focused. How are you feeling today?
+      </div>
+    </div>
+
+    <!-- Quick Suggestions -->
+    <div class="quick-prompts">
+      <button class="prompt-btn" onclick="sendQuickPrompt('How do I handle sudden cravings?')">💡 How to handle cravings?</button>
+      <button class="prompt-btn" onclick="sendQuickPrompt('Give me a quick motivation quote!')">🔥 Need motivation</button>
+      <button class="prompt-btn" onclick="sendQuickPrompt('How can families support recovery?')">👨‍👩‍👧 Family support tips</button>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="chat-input-area">
+      <input type="text" id="userInput" class="chat-input" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+      <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const responses = {
+      cravings: "When experiencing a craving, try the 'Delay and Distract' method: 1. Take 5 deep breaths. 2. Drink a glass of cold water. 3. Play one of our AURA-X mini-games or go for a short walk. Cravings usually peak within 10 minutes and fade away!",
+      motivation: "Remember: You don't have to control your whole life in one day. Just focus on mastering this one single day, one hour at a time. You are stronger than your urges!",
+      family: "Family support is crucial! Practice active listening, avoid judgment, celebrate small milestones, and encourage healthy daily routines and professional guidance.",
+      default: "Thank you for sharing. Remember that recovery is a step-by-step process. Staying committed to small daily progress will lead to huge breakthroughs. You've got this!"
+    };
+
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+
+      if (text === '') return;
+
+      appendMessage(text, 'user');
+      input.value = '';
+
+      // Simulate AI typing delay
+      setTimeout(() => {
+        getAIResponse(text);
+      }, 700);
+    }
+
+    function appendMessage(text, sender) {
+      const chatMessages = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${sender}`;
+      msgDiv.innerText = text;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function getAIResponse(userText) {
+      const lower = userText.toLowerCase();
+      let reply = responses.default;
+
+      if (lower.includes('craving') || lower.includes('urge')) {
+        reply = responses.cravings;
+      } else if (lower.includes('motivat') || lower.includes('quote') || lower.includes('feel down')) {
+        reply = responses.motivation;
+      } else if (lower.includes('family') || lower.includes('parent') || lower.includes('brother')) {
+        reply = responses.family;
+      }
+
+      appendMessage(reply, 'ai');
+    }
+
+    function sendQuickPrompt(promptText) {
+      document.getElementById('userInput').value = promptText;
+      sendMessage();
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dopamine Ninja: Slingshot Explosive Edition</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --emerald: #10b981;
+      --red-danger: #ef4444;
+      --gold: #f59e0b;
+      --text: #f8fafc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .game-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      height: 520px;
+      background: linear-gradient(to bottom, #1e293b 0%, #0f172a 80%, #064e3b 100%);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+
+    /* HUD Header */
+    .hud {
+      position: absolute;
+      top: 15px; left: 20px; right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .badge {
+      font-size: 18px; font-weight: 800; color: var(--gold);
+      background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    canvas {
+      width: 100%; height: 100%; display: block; cursor: pointer;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center; padding: 30px; z-index: 20;
+    }
+
+    .title {
+      font-size: 38px; font-weight: 900;
+      background: linear-gradient(135deg, #34d399, #10b981);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white; border: none; padding: 15px 40px;
+      font-size: 18px; font-weight: bold; border-radius: 12px;
+      cursor: pointer; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+      margin-top: 20px; transition: 0.2s;
+    }
+
+    .btn:hover { transform: scale(1.05); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <div class="hud">
+      <div class="badge" style="color: #38bdf8;" id="levelText">LEVEL: 1</div>
+      <div class="badge" style="color: var(--emerald);" id="attemptsText">NINJAS: 3 🥷</div>
+      <div class="badge" id="scoreText">SCORE: 0</div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- START OVERLAY -->
+    <div id="startScreen" class="overlay">
+      <div style="font-size: 60px;">🥷💥</div>
+      <h1 class="title">DOPAMINE NINJA: EXPLOSIVE</h1>
+      <p style="color: #94a3b8; max-width: 450px;">
+        Launch Ninja to <b>EXPLODE</b> Bad Habit Traps (🚬 🍾 💊 📱) across multiple levels!
+      </p>
+      <button class="btn" onclick="startGame()">START MISSION 🚀</button>
+    </div>
+
+    <!-- LEVEL COMPLETE OVERLAY -->
+    <div id="levelWinScreen" class="overlay hidden">
+      <div style="font-size: 60px;">💥💥</div>
+      <h2 style="color: var(--emerald); font-size: 32px; font-weight: 800;">LEVEL CLEARED!</h2>
+      <p style="color: #cbd5e1; margin-top: 5px;">All traps in this area were destroyed!</p>
+      <button class="btn" onclick="nextLevel()">NEXT LEVEL ➔</button>
+    </div>
+
+    <!-- GAME OVER / FINAL WIN OVERLAY -->
+    <div id="gameOverScreen" class="overlay hidden">
+      <div id="statusIcon" style="font-size: 60px;">🎉</div>
+      <h2 id="statusTitle" style="color: var(--emerald); font-size: 32px; font-weight: 800;">MISSION ACCOMPLISHED!</h2>
+      <p id="statusDesc" style="color: #cbd5e1; margin-top: 5px;">You cleared all levels and saved your focus!</p>
+      <button class="btn" onclick="restartGame()">PLAY AGAIN 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = 900;
+    canvas.height = 520;
+
+    const slingX = 150;
+    const slingY = 370;
+
+    let currentLevel = 1;
+    let score = 0;
+    let ninjasLeft = 3;
+    let isDragging = false;
+    let isLaunched = false;
+    let gameActive = false;
+
+    let ninja = { x: slingX, y: slingY, vx: 0, vy: 0, radius: 25, emoji: "🥷" };
+
+    const FAKE_TRAPS = ["🚬", "🍾", "💊", "📱", "💉"];
+    let blocks = [];
+    let particles = [];
+    let floatingTexts = [];
+
+    // Level Designs
+    const levelLayouts = {
+      1: [ // 3 Blocks
+        { x: 700, y: 400 }, { x: 700, y: 340 }, { x: 700, y: 280 }
+      ],
+      2: [ // 6 Blocks Pyramid
+        { x: 650, y: 400 }, { x: 710, y: 400 }, { x: 770, y: 400 },
+        { x: 680, y: 340 }, { x: 740, y: 340 },
+        { x: 710, y: 280 }
+      ],
+      3: [ // 9 Blocks Tower
+        { x: 620, y: 400 }, { x: 680, y: 400 }, { x: 740, y: 400 }, { x: 800, y: 400 },
+        { x: 650, y: 340 }, { x: 710, y: 340 }, { x: 770, y: 340 },
+        { x: 680, y: 280 }, { x: 740, y: 280 }
+      ]
+    };
+
+    function initLevel(lvl) {
+      blocks = [];
+      const layout = levelLayouts[lvl];
+      layout.forEach((pos, i) => {
+        blocks.push({
+          x: pos.x,
+          y: pos.y,
+          size: 50,
+          emoji: FAKE_TRAPS[i % FAKE_TRAPS.length],
+          hit: false
+        });
+      });
+      ninjasLeft = 3;
+      resetNinja();
+      updateHUD();
+    }
+
+    function startGame() {
+      currentLevel = 1;
+      score = 0;
+      gameActive = true;
+      document.getElementById("startScreen").classList.add("hidden");
+      document.getElementById("gameOverScreen").classList.add("hidden");
+      document.getElementById("levelWinScreen").classList.add("hidden");
+      initLevel(currentLevel);
+      gameLoop();
+    }
+
+    function nextLevel() {
+      currentLevel++;
+      if (currentLevel > 3) {
+        endGame(true); // Victory!
+        return;
+      }
+      document.getElementById("levelWinScreen").classList.add("hidden");
+      gameActive = true;
+      initLevel(currentLevel);
+      gameLoop();
+    }
+
+    function restartGame() {
+      startGame();
+    }
+
+    function resetNinja() {
+      ninja.x = slingX;
+      ninja.y = slingY;
+      ninja.vx = 0;
+      ninja.vy = 0;
+      isLaunched = false;
+      isDragging = false;
+    }
+
+    function updateHUD() {
+      document.getElementById("levelText").innerText = `LEVEL: ${currentLevel}`;
+      document.getElementById("scoreText").innerText = `SCORE: ${score}`;
+      document.getElementById("attemptsText").innerText = `NINJAS: ${ninjasLeft} 🥷`;
+    }
+
+    // Explosion Effect Generator
+    function createExplosion(x, y) {
+      // 1. Spawns Explosion Spark Particles
+      for (let i = 0; i < 18; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 0.5) * 12,
+          color: ["#ef4444", "#f59e0b", "#34d399", "#ffffff"][Math.floor(Math.random() * 4)],
+          radius: Math.random() * 6 + 3,
+          alpha: 1
+        });
+      }
+
+      // 2. Add Explosive Emojis & Comic Text
+      floatingTexts.push({
+        x: x,
+        y: y,
+        text: "💥 BOOM!",
+        opacity: 1,
+        vy: -2
+      });
+    }
+
+    // Drag and Launch Mechanics
+    function handleStart(e) {
+      if (!gameActive || isLaunched) return;
+      const pos = getPos(e);
+      if (Math.hypot(pos.x - ninja.x, pos.y - ninja.y) < 40) {
+        isDragging = true;
+      }
+    }
+
+    function handleMove(e) {
+      if (!isDragging) return;
+      const pos = getPos(e);
+      const angle = Math.atan2(pos.y - slingY, pos.x - slingX);
+      const dist = Math.min(Math.hypot(pos.x - slingX, pos.y - slingY), 85);
+
+      ninja.x = slingX + Math.cos(angle) * dist;
+      ninja.y = slingY + Math.sin(angle) * dist;
+    }
+
+    function handleEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      isLaunched = true;
+
+      ninja.vx = (slingX - ninja.x) * 0.26;
+      ninja.vy = (slingY - ninja.y) * 0.26;
+    }
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+
+    canvas.addEventListener("mousedown", handleStart);
+    canvas.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleEnd);
+
+    canvas.addEventListener("touchstart", handleStart);
+    canvas.addEventListener("touchmove", handleMove);
+    window.addEventListener("touchend", handleEnd);
+
+    function gameLoop() {
+      if (!gameActive) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Ground
+      ctx.fillStyle = "#059669";
+      ctx.fillRect(0, 440, canvas.width, 80);
+
+      // Slingshot Base
+      ctx.strokeStyle = "#78350f";
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(slingX, 440);
+      ctx.lineTo(slingX, slingY + 10);
+      ctx.stroke();
+
+      // Slingshot Rubber
+      if (isDragging || !isLaunched) {
+        ctx.strokeStyle = "#ef4444";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(slingX - 10, slingY);
+        ctx.lineTo(ninja.x, ninja.y);
+        ctx.lineTo(slingX + 10, slingY);
+        ctx.stroke();
+      }
+
+      // Physics Flight
+      if (isLaunched) {
+        ninja.x += ninja.vx;
+        ninja.y += ninja.vy;
+        ninja.vy += 0.35; // Gravity
+
+        // Block Collision
+        blocks.forEach(b => {
+          if (!b.hit) {
+            const dist = Math.hypot(ninja.x - b.x, ninja.y - b.y);
+            if (dist < 42) {
+              b.hit = true;
+              score += 150;
+              createExplosion(b.x, b.y);
+              updateHUD();
+            }
+          }
+        });
+
+        // Reset on Out of Screen
+        if (ninja.y > 420 || ninja.x > canvas.width || ninja.x < 0) {
+          ninjasLeft--;
+          updateHUD();
+
+          if (blocks.every(b => b.hit)) {
+            levelComplete();
+          } else if (ninjasLeft > 0) {
+            resetNinja();
+          } else {
+            endGame(false);
+          }
+        }
+      }
+
+      // Draw Blocks
+      blocks.forEach(b => {
+        if (!b.hit) {
+          ctx.font = `${b.size}px Arial`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(b.emoji, b.x, b.y);
+        }
+      });
+
+      // Render Particles (Explosion Spurt)
+      particles.forEach((p, index) => {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.03;
+        if (p.alpha <= 0) particles.splice(index, 1);
+      });
+
+      // Render Floating Comic Texts
+      floatingTexts.forEach((ft, index) => {
+        ctx.font = "bold 26px Arial";
+        ctx.fillStyle = "#f59e0b";
+        ctx.globalAlpha = ft.opacity;
+        ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.globalAlpha = 1.0;
+
+        ft.y += ft.vy;
+        ft.opacity -= 0.02;
+        if (ft.opacity <= 0) floatingTexts.splice(index, 1);
+      });
+
+      // Draw Ninja
+      ctx.font = `${ninja.radius * 2}px Arial`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(ninja.emoji, ninja.x, ninja.y);
+
+      // Check Instant Win Level
+      if (blocks.every(b => b.hit) && gameActive) {
+        levelComplete();
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function levelComplete() {
+      gameActive = false;
+      if (currentLevel === 3) {
+        endGame(true);
+      } else {
+        document.getElementById("levelWinScreen").classList.remove("hidden");
+      }
+    }
+
+    function endGame(isWin) {
+      gameActive = false;
+      const screen = document.getElementById("gameOverScreen");
+      const icon = document.getElementById("statusIcon");
+      const title = document.getElementById("statusTitle");
+      const desc = document.getElementById("statusDesc");
+
+      screen.classList.remove("hidden");
+
+      if (isWin) {
+        icon.innerText = "🏆";
+        title.innerText = "ULTIMATE VICTORY!";
+        title.style.color = "var(--emerald)";
+        desc.innerText = `You cleared all 3 levels with ${score} Points!`;
+      } else {
+        icon.innerText = "💥";
+        title.innerText = "OUT OF NINJAS!";
+        title.style.color = "var(--red-danger)";
+        desc.innerText = "The traps survived Level " + currentLevel + ". Try again!";
+      }
+    }
+  </script>
+</body>
+</html>

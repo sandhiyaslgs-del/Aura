@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA-X Games</title>
+  <style>
+    :root {
+      --bg-dark: #060c0e;
+      --card-bg: #10171d;
+      --accent-green: #00e599;
+      --accent-glow: rgba(0, 229, 153, 0.4);
+      --text: #ffffff;
+      --text-muted: #8c9da8;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Inter, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      margin-bottom: 40px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--text);
+    }
+
+    /* SVG Hexagon Logo with 'A' */
+    .brand-logo-svg {
+      width: 32px;
+      height: 36px;
+    }
+
+    .home-btn {
+      background: var(--accent-green);
+      color: #000;
+      text-decoration: none;
+      padding: 10px 26px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 0 15px var(--accent-glow);
+      transition: all 0.3s ease;
+    }
+
+    .home-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px var(--accent-glow);
+      filter: brightness(1.1);
+    }
+
+    /* Welcome Section */
+    .header-section {
+      text-align: center;
+      max-width: 750px;
+      margin-bottom: 35px;
+    }
+
+    .header-section h1 {
+      font-size: 42px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    .header-section p {
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* Search Bar */
+    .search-container {
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 20px;
+      padding-left: 48px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    /* Games Grid */
+    .games-grid {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 25px;
+    }
+
+    .game-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .game-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent-green);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 153, 0.15);
+    }
+
+    .game-icon {
+      font-size: 40px;
+      margin-bottom: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+    }
+
+    .game-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    .game-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 25px;
+      line-height: 1.5;
+      flex-grow: 1;
+    }
+
+    .play-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent-green);
+      color: #000;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 14px;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .play-btn:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 16px;
+      display: none;
+      padding: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <div class="nav-bar">
+    <div class="brand">
+      <svg class="brand-logo-svg" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,5 95,30 95,85 50,110 5,85 5,30" stroke="#00e599" stroke-width="10" fill="none" />
+        <text x="50" y="78" font-size="58" font-weight="900" fill="#00e599" text-anchor="middle" font-family="Arial, sans-serif">A</text>
+      </svg>
+      <span>AURA-X</span>
+    </div>
+    <a href="homepage.html" class="home-btn">Home</a>
+  </div>
+
+  <!-- Header Welcome Text -->
+  <div class="header-section">
+    <h1>Welcome to AURA-X Arcade</h1>
+    <p>Empowering youth through interactive games. Build focus, reject distractions, and train your mind with our custom mini-games.</p>
+  </div>
+
+  <!-- Search Box -->
+  <div class="search-container">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" class="search-input" placeholder="Search games (Angry, Dopamainninja, Findpath, Refusal)..." onkeyup="filterGames()">
+  </div>
+
+  <!-- Games Boxes -->
+  <div class="games-grid" id="gamesGrid">
+
+    <!-- Game 1 -->
+    <div class="game-card" data-name="angry slingshot blast">
+      <div class="game-icon">🏹</div>
+      <h2 class="game-title">Angry Slingshot</h2>
+      <p class="game-desc">Launch slingshots to smash away distractions and test your aiming accuracy.</p>
+      <a href="Angry.html" class="play-btn">🎮 Play Game</a>
+    </div>
+
+    <!-- Game 2 -->
+    <div class="game-card" data-name="dopamainninja dopamine ninja slice">
+      <div class="game-icon">🥷</div>
+      <h2 class="game-title">Dopamine Ninja</h2>
+      <p class="game-desc">Slice positive habit targets while avoiding bad triggers to train reaction speed.</p>
+      <a href="Dopamainninja.html" class="play-btn">🎮 Play Game</a>
+    </div>
+
+    <!-- Game 3 -->
+    <div class="game-card" data-name="findpath pathfinder maze">
+      <div class="game-icon">🗺️</div>
+      <h2 class="game-title">Find Path</h2>
+      <p class="game-desc">Navigate through moving obstacles to guide your ninja safely to the goal.</p>
+      <a href="Findpath.html" class="play-btn">🎮 Play Game</a>
+    </div>
+
+    <!-- Game 4 -->
+    <div class="game-card" data-name="refusal monster refuse">
+      <div class="game-icon">👾</div>
+      <h2 class="game-title">Refuse Monster</h2>
+      <p class="game-desc">Intercept and tap away bad habit monsters before they reach your safe zone.</p>
+      <a href="Refuasal.html" class="play-btn">🎮 Play Game</a>
+    </div>
+
+    <div class="no-results" id="noResults">
+      No games found matching your search.
+    </div>
+
+  </div>
+
+  <script>
+    function filterGames() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.game-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const name = card.getAttribute('data-name');
+        if (name.includes(input)) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      const noResults = document.getElementById('noResults');
+      if (visibleCount === 0) {
+        noResults.style.display = 'block';
+      } else {
+        noResults.style.display = 'none';
+      }
+    }
+  </script>
+
+</body>
+</html>
